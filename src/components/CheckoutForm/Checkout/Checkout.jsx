@@ -27,19 +27,21 @@ const Checkout = ({ cart, order, onCaptureCheckout, error }) => {
   const history = useHistory();
 
   useEffect(() => {
-    const generateToken = async () => {
-      try {
-        const token = await commerce.checkout.generateToken(cart.id, {
-          type: "cart",
-        });
-        setCheckoutToken(token);
-      } catch (error) {
-        history.pushState("/");
-      }
-    };
+    if (cart.id) {
+      const generateToken = async () => {
+        try {
+          const token = await commerce.checkout.generateToken(cart.id, {
+            type: "cart",
+          });
+          setCheckoutToken(token);
+        } catch (error) {
+          history.pushState("/");
+        }
+      };
 
-    generateToken();
-  }, []);
+      generateToken();
+    }
+  }, [cart]);
 
   const nextStep = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
   const backStep = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -109,6 +111,7 @@ const Checkout = ({ cart, order, onCaptureCheckout, error }) => {
         checkoutToken={checkoutToken}
         backStep={backStep}
         nextStep={nextStep}
+        shippingData={shippingData}
         onCaptureCheckou={onCaptureCheckout}
         timeout={timeout}
       />
