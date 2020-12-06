@@ -22,7 +22,6 @@ const Checkout = ({ cart, order, onCaptureCheckout, error }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [checkoutToken, setCheckoutToken] = useState(null);
   const [shippingData, setShippingData] = useState({});
-  const [isFinished, setIsFinished] = useState(false);
   const classes = useStyles();
   const history = useHistory();
 
@@ -33,9 +32,10 @@ const Checkout = ({ cart, order, onCaptureCheckout, error }) => {
           const token = await commerce.checkout.generateToken(cart.id, {
             type: "cart",
           });
+
           setCheckoutToken(token);
-        } catch (error) {
-          history.pushState("/");
+        } catch {
+          if (activeStep !== steps.length) history.push("/");
         }
       };
 
@@ -52,12 +52,6 @@ const Checkout = ({ cart, order, onCaptureCheckout, error }) => {
     nextStep();
   };
 
-  const timeout = () => {
-    setTimeout(() => {
-      setIsFinished(true);
-    }, 3000);
-  };
-
   let Confirmation = () =>
     order.customer ? (
       <>
@@ -70,17 +64,6 @@ const Checkout = ({ cart, order, onCaptureCheckout, error }) => {
           <Typography variant="subtitle2">
             Order ref: {order.customer_reference}
           </Typography>
-        </div>
-        <br />
-        <Button component={Link} to="/" variant="outlined" type="button">
-          Back to Home
-        </Button>
-      </>
-    ) : isFinished ? (
-      <>
-        <div>
-          <Typography>Thank you for your purchase</Typography>
-          <Divider className={classes.divider} />
         </div>
         <br />
         <Button component={Link} to="/" variant="outlined" type="button">
@@ -113,7 +96,6 @@ const Checkout = ({ cart, order, onCaptureCheckout, error }) => {
         nextStep={nextStep}
         shippingData={shippingData}
         onCaptureCheckou={onCaptureCheckout}
-        timeout={timeout}
       />
     );
 
